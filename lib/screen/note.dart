@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class NotePage extends StatefulWidget {
+  const NotePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<NotePage> createState() => _NotePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _NotePageState extends State<NotePage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
