@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:note/screen/home.dart';
+import 'package:note/screen/note.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
       'password': '123456',
     },
     {
-      'name': 'Ulfi Nabila',
+      'name': 'Adzikra',
       'email': 'user2@example.com',
       'password': 'passwordku',
     },
@@ -42,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
     await prefs.setString('password', password);
   }
 
+  // ignore: unused_element
   void _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
       final inputEmail = _emailController.text.trim();
@@ -153,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                             // Jika cocok, pindah ke halaman Home
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => const HomePage()),
+                              MaterialPageRoute(builder: (context) => const NotePage()),
                             );
                           } else {
                             // Jika tidak cocok, tampilkan error
