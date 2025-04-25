@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:note/screen/home_screen.dart';
 import 'package:note/screen/navigation/navigation_bar.dart';
 
 class SplashScreen extends StatefulWidget {

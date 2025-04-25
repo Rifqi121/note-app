@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note/screen/edit_page.dart';
 import '../home_screen.dart';
 import '../note.dart';
 
@@ -14,12 +15,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    const NotePage(),
-  ];
-
-  final List<String> _titles = [
-    'Halaman Beranda',
-    'Note Keeper',
+    const EditPage(),
   ];
 
   void _onItemTapped(int index) {
