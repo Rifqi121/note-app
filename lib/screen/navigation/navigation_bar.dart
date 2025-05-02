@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note/screen/edit_page.dart';
 import '../home_screen.dart';
-import '../note.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});

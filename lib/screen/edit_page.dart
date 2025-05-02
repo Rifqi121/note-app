@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:note/state/cubit/notes_cubit.dart';
 import '../models/post.dart';
+import 'package:intl/intl.dart';
+
 
 class EditPage extends StatefulWidget {
   const EditPage({super.key});
@@ -25,21 +29,44 @@ class _EditPageState extends State<EditPage> {
   }
 
   void _saveNote() {
-    final title = _titleController.text;
-    final body = _bodyController.text;
+    final title = _titleController.text.trim();
+    final body = _bodyController.text.trim();
 
-    if (title.isNotEmpty && body.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Catatan "${title}" disimpan!')),
-      );
-      Navigator.pop(context);
-    }
+    if (title.isEmpty || body.isEmpty) return;
+
+    final cubit = context.read<NotesCubit>();
+
+    if (post != null) {
+    final updatedPost = Post(
+      userId: post!.userId,
+      id: post!.id,
+      title: title,
+      body: body,
+      createAt: 'lastedited ${DateFormat('dd-mm-yyyy', 'id').format(DateTime.now())}'
+    );
+    cubit.updateNote(updatedPost);
+    Navigator.pop(context, updatedPost); // Kirim catatan hasil update
+  } else {
+    final newId = DateTime.now().millisecondsSinceEpoch;
+    final newPost = Post(
+      userId: 1,
+      id: newId,
+      title: title,
+      body: body,
+      createAt: DateFormat('dd-mm-yyyy', 'id').format(DateTime.now())
+    );
+    cubit.addNote(newPost);
+    Navigator.pop(context, newPost); // Kirim catatan baru
+  }
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(post != null ? 'Edit Catatan' : 'Tambah Catatan')),
+      appBar: AppBar(
+        title: Text(post != null ? 'Edit Catatan' : 'Tambah Catatan'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
