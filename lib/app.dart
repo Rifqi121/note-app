@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:note/screen/detail_page.dart';
 import 'package:note/screen/edit_page.dart';
+import 'package:note/screen/home_screen.dart';
 import 'package:note/screen/navigation/navigation_bar.dart';
-import 'package:note/screen/second_screen.dart';
 import 'package:note/screen/splash_screen.dart';
-import 'package:note/screen/third_screen.dart';
 import 'package:note/state/cubit/notes_cubit.dart';
 
 class MainApp extends StatelessWidget {
@@ -24,12 +23,11 @@ class MainApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          '/': (context) => MainNavigation(),       // Navigasi utama dengan bottom nav bar
+          '/': (context) => MainNavigation(),
           '/splash': (context) => const SplashScreen(),
-          '/second': (context) => SecondScreen(),
-          '/third': (context) => ThirdScreen(),
           '/detail': (context) => const DetailPage(),
           '/edit': (context) => const EditPage(),
+          '/home': (context) => const HomeScreen(),
         },
       ),
     );

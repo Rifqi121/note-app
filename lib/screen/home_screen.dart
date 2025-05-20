@@ -1,98 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:note/state/cubit/notes_cubit.dart';
-import 'package:note/widgets/note_card.dart';
+import 'package:note/di.dart';
+import 'package:note/services/post_repository.dart';
+import 'package:note/state/bloc/post_bloc.dart';
+import 'package:note/state/bloc/post_event.dart';
+import 'package:note/state/bloc/post_state.dart';
+import '../widgets/note_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Beranda', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue,
-      ),
-      body: BlocBuilder<NotesCubit, NotesState>(
-        builder: (context, state) {
-          if (state is NotesInitial) {
-            return const Center(child: Text('Belum ada catatan'));
-          } else if (state is NotesLoaded) {
-            final notes = state.notes;
-            if (notes.isEmpty) {
-              return const Center(child: Text('Tidak ada catatan'));
+    return BlocProvider(
+      create: (_) => PostBloc(getIt<PostRepository>())..add(FetchPosts()),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Beranda', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.blue,
+        ),
+        body: BlocConsumer<PostBloc, PostState>(
+          listener: (context, state) {
+            if (state is PostLoaded) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Data berhasil ditampilkan')),
+              );
+            } else if (state is PostError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Data tidak ditemukan')),
+              );
             }
-            return ListView.builder(
-              itemCount: notes.length,
-              itemBuilder: (context, index) {
-                final post = notes[index];
-                return Dismissible(
-                  key: Key(post.id.toString()),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    color: Colors.red,
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  confirmDismiss: (direction) async {
-                    return await showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Hapus Catatan?'),
-                        content: const Text('Catatan ini akan dihapus secara permanen.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(false),
-                            child: const Text('Batal'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(true),
-                            child: const Text('Hapus'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  onDismissed: (_) {
-                    context.read<NotesCubit>().deleteNote(post.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Catatan "${post.title}" dihapus')),
-                    );
-                  },
-                  child: Padding(
+          },
+          builder: (context, state) {
+            if (state is PostLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is PostLoaded) {
+              if (state.posts.isEmpty) {
+                return const Center(child: Text('Belum ada data post'));
+              }
+              return ListView.builder(
+                itemCount: state.posts.length,
+                itemBuilder: (context, index) {
+                  final post = state.posts[index];
+                  return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/detail', arguments: post);
+                        Navigator.pushNamed(
+                          context, 
+                          '/detail',
+                          arguments: post,
+                        );
                       },
-                      child: NoteCard(
-                        title: Text(post.title),
-                        content: Text(
-                          post.body,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        date: post.createAt,
-                        owner: 'created by rifqi',
-                        priority: 'low',
-                        onInfo: () {},
-                      ),
+                    child: NoteCard(
+                      title: Text(post.title),
+                      content: Text(post.body, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      date: '12-04-2025',
+                      owner: 'Rifqi',
+                      priority: 'low',
+                      onInfo: () {},
                     ),
-                  ),
-                );
+                  )
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text('Terjadi kesalahan'));
+            }
+          },
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            // Tombol Reload Data
+            FloatingActionButton(
+              heroTag: 'reload',
+              onPressed: () {},
+              tooltip: 'Muat Ulang',
+              backgroundColor: Colors.orange,
+              child: const Icon(Icons.refresh),
+            ),
+            const SizedBox(height: 16),
+            // Tombol Tambah Data
+            FloatingActionButton(
+              heroTag: 'add',
+              onPressed: () {
+                Navigator.pushNamed(context, '/edit'); // Ganti '/edit' dengan rute ke halaman tambah catatan
               },
-            );
-          } else {
-            return const Center(child: Text('Terjadi kesalahan'));
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/edit');
-        },
-        child: const Icon(Icons.add),
+              tooltip: 'Tambah Catatan',
+              backgroundColor: Colors.blue,
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
+
       ),
     );
   }

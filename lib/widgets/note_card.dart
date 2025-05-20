@@ -25,8 +25,6 @@ class NoteCard extends StatelessWidget {
         return Colors.red[100]!;
       case 'medium':
         return Colors.yellow[100]!;
-      case 'low':
-        return Colors.green[100]!;
       default:
         return Colors.white;
     }
@@ -39,8 +37,6 @@ class NoteCard extends StatelessWidget {
         return Colors.red[900]!;
       case 'medium':
         return Colors.brown[800]!;
-      case 'low':
-        return Colors.green[900]!;
       default:
         return Colors.black;
     }
@@ -53,8 +49,6 @@ class NoteCard extends StatelessWidget {
         return Colors.red[900]!;
       case 'medium':
         return Colors.brown[800]!;
-      case 'low':
-        return Colors.green[900]!;
       default:
         return Colors.black;
     }

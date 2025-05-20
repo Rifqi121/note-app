@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:note/screen/edit_page.dart';
+import 'package:note/screen/profil_screen.dart';
 import '../home_screen.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -14,7 +14,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    const EditPage(),
+    const ProfilScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -38,8 +38,8 @@ class _MainNavigationState extends State<MainNavigation> {
             label: 'Beranda',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.note),
-            label: 'Catatan',
+            icon: Icon(Icons.person),
+            label: 'Profil',
           ),
         ],
       ),

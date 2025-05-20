@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:note/state/cubit/notes_cubit.dart';
-import '../models/post.dart';
 import 'package:intl/intl.dart';
-
+import '../models/note.dart';
+import 'package:note/state/bloc/post_bloc.dart';
 
 class EditPage extends StatefulWidget {
   const EditPage({super.key});
@@ -15,16 +14,44 @@ class EditPage extends StatefulWidget {
 class _EditPageState extends State<EditPage> {
   final _titleController = TextEditingController();
   final _bodyController = TextEditingController();
-  Post? post;
+  Note? note;
+
+  // Variabel untuk tampilan lokal saja
+  DateTime? _selectedDeadline;
+  String? _selectedStatus;
+  String? _selectedPriority;
+
+  final List<String> statusList = ['Belum Dikerjakan', 'Sedang Dikerjakan', 'Selesai'];
+  final List<String> priorityList = ['Rendah', 'Sedang', 'Tinggi'];
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is Post) {
-      post = args;
-      _titleController.text = post!.title;
-      _bodyController.text = post!.body;
+    if (args is Note) {
+      note = args;
+      _titleController.text = note!.title;
+      _bodyController.text = note!.body;
+
+      // Set default lokal status/prioritas jika mau, bisa juga dikosongkan
+      _selectedStatus = statusList[0];
+      _selectedPriority = priorityList[1];
+      _selectedDeadline = null;
+    }
+  }
+
+  void _pickDeadline() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDeadline ?? now,
+      firstDate: DateTime(now.year - 5),
+      lastDate: DateTime(now.year + 5),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDeadline = picked;
+      });
     }
   }
 
@@ -32,61 +59,151 @@ class _EditPageState extends State<EditPage> {
     final title = _titleController.text.trim();
     final body = _bodyController.text.trim();
 
-    if (title.isEmpty || body.isEmpty) return;
+    if (title.isEmpty || body.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Judul dan isi catatan tidak boleh kosong!')),
+      );
+      return;
+    }
 
-    final cubit = context.read<NotesCubit>();
+    final postBloc = context.read<PostBloc>();
 
-    if (post != null) {
-    final updatedPost = Post(
-      userId: post!.userId,
-      id: post!.id,
-      title: title,
-      body: body,
-      createAt: 'lastedited ${DateFormat('dd-mm-yyyy', 'id').format(DateTime.now())}'
-    );
-    cubit.updateNote(updatedPost);
-    Navigator.pop(context, updatedPost); // Kirim catatan hasil update
-  } else {
-    final newId = DateTime.now().millisecondsSinceEpoch;
-    final newPost = Post(
-      userId: 1,
-      id: newId,
-      title: title,
-      body: body,
-      createAt: DateFormat('dd-mm-yyyy', 'id').format(DateTime.now())
-    );
-    cubit.addNote(newPost);
-    Navigator.pop(context, newPost); // Kirim catatan baru
-  }
-
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(post != null ? 'Edit Catatan' : 'Tambah Catatan'),
+        title: Text(note != null ? 'Edit Catatan' : 'Tambah Catatan'),
+        backgroundColor: Colors.blue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Judul'),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Card(
+            elevation: 8,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  // Judul
+                  TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: 'Judul',
+                      prefixIcon: Icon(Icons.title, color: Colors.blue),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                      filled: true,
+                      fillColor: Colors.blue[50],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Isi Catatan
+                  TextField(
+                    controller: _bodyController,
+                    maxLines: 10,
+                    decoration: InputDecoration(
+                      labelText: 'Isi Catatan',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Deadline (lokal saja)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _selectedDeadline == null
+                              ? 'Batas Waktu: Belum dipilih'
+                              : 'Batas Waktu: ${DateFormat('dd MMMM yyyy', 'id').format(_selectedDeadline!)}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: _pickDeadline,
+                        icon: Icon(Icons.calendar_today, color: Colors.blue),
+                        label: Text('Pilih', style: TextStyle(color: Colors.blue)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Status (lokal)
+                  DropdownButtonFormField<String>(
+                    value: _selectedStatus,
+                    items: statusList
+                        .map((status) => DropdownMenuItem(
+                              value: status,
+                              child: Text(status),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedStatus = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Status Pekerjaan',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                      filled: true,
+                      fillColor: Colors.blue[50],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Prioritas (lokal)
+                  DropdownButtonFormField<String>(
+                    value: _selectedPriority,
+                    items: priorityList
+                        .map((prio) => DropdownMenuItem(
+                              value: prio,
+                              child: Text(prio),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedPriority = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Prioritas',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                      filled: true,
+                      fillColor: Colors.blue[50],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Tombol Simpan
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue[200],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: (){
+                        Navigator.pushNamedAndRemoveUntil(
+                          context, 
+                          '/',
+                          (Route<dynamic> route) => false);
+                      },
+                      icon: Icon(Icons.save),
+                      label: Text(
+                        'Simpan',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _bodyController,
-              maxLines: 5,
-              decoration: const InputDecoration(labelText: 'Isi Catatan'),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _saveNote,
-              child: const Text('Simpan'),
-            )
-          ],
+          ),
         ),
       ),
     );
