@@ -53,7 +53,7 @@ class DefaultFirebaseOptions {
     projectId: 'notes-pbi',
     authDomain: 'notes-pbi.firebaseapp.com',
     storageBucket: 'notes-pbi.firebasestorage.app',
-    databaseURL: 'https://notes-pbi-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    databaseURL: 'https://notes-pbi-default-rtdb.asia-southeast1.firebasedatabase.app'
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '512466565099',
     projectId: 'notes-pbi',
     storageBucket: 'notes-pbi.firebasestorage.app',
-    databaseURL: 'https://notes-pbi-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    databaseURL: 'https://notes-pbi-default-rtdb.asia-southeast1.firebasedatabase.app'
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -72,7 +72,7 @@ class DefaultFirebaseOptions {
     projectId: 'notes-pbi',
     storageBucket: 'notes-pbi.firebasestorage.app',
     iosBundleId: 'com.example.note',
-    databaseURL: 'https://notes-pbi-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    databaseURL: 'https://notes-pbi-default-rtdb.asia-southeast1.firebasedatabase.app'
   );
 
 }

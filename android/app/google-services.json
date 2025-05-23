@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "512466565099",
+    "firebase_url": "https://notes-pbi-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "notes-pbi",
     "storage_bucket": "notes-pbi.firebasestorage.app"
   },

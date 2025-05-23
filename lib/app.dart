@@ -31,7 +31,7 @@ class MainApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        initialRoute: '/',
+        initialRoute: '/main',
         routes: {
           '/main': (context) => MainNavigation(),
           '/': (context) => LoginPage(),
