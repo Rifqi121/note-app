@@ -4,7 +4,7 @@ import 'package:note/state/bloc/auth/auth_bloc.dart';
 import 'package:note/state/bloc/auth/auth_event.dart';
 import 'package:note/state/bloc/auth/auth_state.dart';
 
-class LoginPage extends StatelessWidget {
+class RegisterPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -16,9 +16,9 @@ class LoginPage extends StatelessWidget {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
-            Navigator.pushNamedAndRemoveUntil(context, '/main',(Route<dynamic> route) => false);
+            Navigator.pushReplacementNamed(context, '/');
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Login berhasil!'))
+              SnackBar(content: Text('Registrasi berhasil!'))
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +50,6 @@ class LoginPage extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Logo atau Icon
                         CircleAvatar(
                           radius: 36,
                           backgroundColor: theme.primaryColor.withValues(),
@@ -58,7 +57,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         SizedBox(height: 24),
                         Text(
-                          "Welcome Back",
+                          "Create Account",
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.primaryColor,
@@ -66,7 +65,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          "Login to your account",
+                          "Register to get started",
                           style: theme.textTheme.titleMedium,
                         ),
                         SizedBox(height: 24),
@@ -95,7 +94,7 @@ class LoginPage extends StatelessWidget {
                           obscureText: true,
                         ),
                         SizedBox(height: 24),
-                        // Login Button
+                        // Register Button
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -109,19 +108,19 @@ class LoginPage extends StatelessWidget {
                             ),
                             onPressed: () {
                               context.read<AuthBloc>().add(
-                                LoggedIn(emailController.text, passwordController.text)
+                                Registered(emailController.text, passwordController.text)
                               );
                             },
-                            child: Text("Login", style: TextStyle(fontSize: 16, color: Colors.white)),
+                            child: Text("Register", style: TextStyle(fontSize: 16, color: Colors.white)),
                           ),
                         ),
                         SizedBox(height: 12),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/register');
+                            Navigator.pop(context);
                           },
                           child: Text(
-                            "Don't have an account? Register",
+                            "Already have an account? Login",
                             style: TextStyle(color: theme.primaryColor),
                           ),
                         ),

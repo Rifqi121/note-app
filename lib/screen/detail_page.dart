@@ -16,7 +16,7 @@ class DetailPage extends StatelessWidget {
       );
     }
 
-    final Note post = args;
+    final Note note = args;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,20 +26,12 @@ class DetailPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Edit Catatan',
-            onPressed: () async {
-              final editedPost = await Navigator.pushNamed(
+            onPressed: () {
+              Navigator.pushNamed(
                 context,
                 '/edit',
-                arguments: post,
+                arguments: note,
               );
-
-              if (editedPost is Note) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  '/detail',
-                  arguments: editedPost,
-                );
-              }
             },
           ),
         ],
@@ -50,11 +42,11 @@ class DetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              post.title,
+              note.title,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            Text(post.body, style: const TextStyle(fontSize: 18)),
+            Text(note.description, style: const TextStyle(fontSize: 18)),
           ],
         ),
       ),

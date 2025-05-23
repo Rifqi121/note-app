@@ -1,31 +1,38 @@
 class Note {
-  final int userId;
-  final int id;
+  final String id;
   final String title;
-  final String body;
+  final String description;
 
   Note({
-    required this.userId,
     required this.id,
     required this.title,
-    required this.body,
+    required this.description,
   });
 
-  factory Note.fromJson(Map<String, dynamic> json) {
+  factory Note.fromMap(Map<String, dynamic> map, String id) {
     return Note(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
-      body: json['body'],
+      id: id,
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'userId': userId,
-      'id': id,
       'title': title,
-      'body': body,
+      'description': description,
     };
+  }
+
+  Note copyWith({
+    String? id,
+    String? title,
+    String? description,
+  }) {
+    return Note(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+    );
   }
 }

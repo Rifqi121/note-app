@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:note/state/bloc/note/note_bloc.dart';
 import '../models/note.dart';
-import 'package:note/state/bloc/post_bloc.dart';
 
 class EditPage extends StatefulWidget {
   const EditPage({super.key});
@@ -31,7 +31,7 @@ class _EditPageState extends State<EditPage> {
     if (args is Note) {
       note = args;
       _titleController.text = note!.title;
-      _bodyController.text = note!.body;
+      _bodyController.text = note!.description;
 
       // Set default lokal status/prioritas jika mau, bisa juga dikosongkan
       _selectedStatus = statusList[0];
@@ -56,20 +56,38 @@ class _EditPageState extends State<EditPage> {
   }
 
   void _saveNote() {
-    final title = _titleController.text.trim();
-    final body = _bodyController.text.trim();
+  final title = _titleController.text.trim();
+  final description = _bodyController.text.trim();
 
-    if (title.isEmpty || body.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Judul dan isi catatan tidak boleh kosong!')),
-      );
-      return;
-    }
-
-    final postBloc = context.read<PostBloc>();
-
-    Navigator.pop(context);
+  if (title.isEmpty || description.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Judul dan isi catatan tidak boleh kosong!')),
+    );
+    return;
   }
+
+  final noteBloc = context.read<NoteBloc>();
+
+  if (note != null) {
+    // Edit mode
+    final updatedNote = note!.copyWith(
+      title: title,
+      description: description,
+    );
+    noteBloc.add(UpdateNoteEvent(updatedNote));
+  } else {
+    // Add mode
+    final newNote = Note(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+      description: description,
+    );
+    noteBloc.add(AddNoteEvent(newNote));
+  }
+
+  Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +157,7 @@ class _EditPageState extends State<EditPage> {
                         .map((status) => DropdownMenuItem(
                               value: status,
                               child: Text(status),
-                            ))
-                        .toList(),
+                            )).toList(),
                     onChanged: (value) {
                       setState(() {
                         _selectedStatus = value;
@@ -154,15 +171,13 @@ class _EditPageState extends State<EditPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Prioritas (lokal)
                   DropdownButtonFormField<String>(
                     value: _selectedPriority,
                     items: priorityList
                         .map((prio) => DropdownMenuItem(
                               value: prio,
                               child: Text(prio),
-                            ))
-                        .toList(),
+                            )).toList(),
                     onChanged: (value) {
                       setState(() {
                         _selectedPriority = value;
@@ -187,12 +202,7 @@ class _EditPageState extends State<EditPage> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      onPressed: (){
-                        Navigator.pushNamedAndRemoveUntil(
-                          context, 
-                          '/',
-                          (Route<dynamic> route) => false);
-                      },
+                      onPressed: _saveNote,
                       icon: Icon(Icons.save),
                       label: Text(
                         'Simpan',

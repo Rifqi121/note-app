@@ -1,10 +1,12 @@
 import 'package:get_it/get_it.dart';
-import 'package:note/services/api_service.dart';
-import 'package:note/services/post_repository.dart';
+import 'package:note/repositories/auth_repository.dart';
+import 'package:note/repositories/note_repository.dart';
+import 'package:note/state/bloc/note/note_bloc.dart';
 
 final getIt = GetIt.instance;
 
 void setupLocator() {
-  getIt.registerLazySingleton(() => PostApi());
-  getIt.registerLazySingleton(() => PostRepository(getIt<PostApi>()));
+  getIt.registerLazySingleton<AuthenticationRepository>(() => AuthenticationRepository());
+  getIt.registerLazySingleton<NoteRepository>(() => NoteRepository());
+  getIt.registerFactory(() => NoteBloc(getIt<NoteRepository>()));
 }
