@@ -31,8 +31,6 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
         "Catatan Baru",
         "Catatan baru telah berhasil ditambahkan!",
       );
-      final notes = await repository.getNotesStream();
-      emit(NoteLoaded(notes as List<Note>));
     } catch (e) {
       emit(NoteError("Gagal menambahkan catatan: $e"));
     }
@@ -40,11 +38,24 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     });
 
     on<UpdateNoteEvent>((event, emit) async {
-      await repository.updateNote(event.note);
+      try {
+        await repository.updateNote(event.note);
+        await FirebaseService.showNotification(
+          "Catatan Update",
+          "Catatan telah berhasil diubah!",
+        );
+        add(LoadNotes());
+      } catch (e) {
+        emit(NoteError("Gagal memperbarui catatan: $e"));
+      }
     });
 
     on<DeleteNoteEvent>((event, emit) async {
-      await repository.deleteNote(event.id);
+      try {
+        await repository.deleteNote(event.id);
+      } catch (e) {
+        emit(NoteError("Gagal menghapus catatan: $e"));
+      }
     });
   }
 }

@@ -17,8 +17,9 @@ class LoggedIn extends AuthEvent {
 class Registered extends AuthEvent {
   final String email;
   final String password;
+  final String nama;
 
-  Registered(this.email, this.password);
+  Registered(this.email, this.password, this.nama);
 }
 
 class LoggedOut extends AuthEvent {}

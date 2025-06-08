@@ -12,7 +12,6 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id', null); 
   await Firebase.initializeApp(
-    name: 'notes-pbi',
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseService.initNotifications();

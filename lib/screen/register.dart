@@ -7,6 +7,10 @@ import 'package:note/state/bloc/auth/auth_state.dart';
 class RegisterPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,84 +51,126 @@ class RegisterPage extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundColor: theme.primaryColor.withValues(),
-                          child: Icon(Icons.notes, size: 40, color: Colors.white),
-                        ),
-                        SizedBox(height: 24),
-                        Text(
-                          "Create Account",
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.primaryColor,
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 36,
+                            backgroundColor: theme.primaryColor,
+                            child: Icon(Icons.notes, size: 40, color: Colors.white),
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          "Register to get started",
-                          style: theme.textTheme.titleMedium,
-                        ),
-                        SizedBox(height: 24),
-                        // Email Input
-                        TextField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.email_outlined),
-                            labelText: 'Email',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
+                          SizedBox(height: 24),
+                          Text(
+                            "Create Account",
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.primaryColor,
                             ),
                           ),
-                        ),
-                        SizedBox(height: 16),
-                        // Password Input
-                        TextField(
-                          controller: passwordController,
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.lock_outline),
-                            labelText: 'Password',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Register to get started",
+                            style: theme.textTheme.titleMedium,
                           ),
-                          obscureText: true,
-                        ),
-                        SizedBox(height: 24),
-                        // Register Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
+                          SizedBox(height: 24),
+
+                          TextFormField(
+                            controller: nameController,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.person_outline),
+                              labelText: 'Nama',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              )
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Nama wajib diisi';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 16),
+
+                          TextFormField(
+                            controller: emailController,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.email_outlined),
+                              labelText: 'Email',
+                              border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              elevation: 5,
-                              backgroundColor: theme.primaryColor,
                             ),
-                            onPressed: () {
-                              context.read<AuthBloc>().add(
-                                Registered(emailController.text, passwordController.text)
-                              );
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Email wajib diisi';
+                              }
+                              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                              if (!emailRegex.hasMatch(value)) {
+                                return 'Format email tidak valid';
+                              }
+                              return null;
                             },
-                            child: Text("Register", style: TextStyle(fontSize: 16, color: Colors.white)),
                           ),
-                        ),
-                        SizedBox(height: 12),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "Already have an account? Login",
-                            style: TextStyle(color: theme.primaryColor),
+                          SizedBox(height: 16),
+
+                          TextFormField(
+                            controller: passwordController,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.lock_outline),
+                              labelText: 'Password',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Password wajib diisi';
+                              }
+                              if (value.length < 6) {
+                                return 'Password minimal 6 karakter';
+                              }
+                              return null;
+                            },
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 24),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 5,
+                                backgroundColor: theme.primaryColor,
+                              ),
+                              onPressed: () {
+                                if (_formKey.currentState?.validate() == true) {
+                                  context.read<AuthBloc>().add(
+                                    Registered(emailController.text, passwordController.text, nameController.text)
+                                  );
+                                }
+                              },
+                              child: Text("Register", style: TextStyle(fontSize: 16, color: Colors.white)),
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              "Already have an account? Login",
+                              style: TextStyle(color: theme.primaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

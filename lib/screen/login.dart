@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:note/state/bloc/auth/auth_bloc.dart';
 import 'package:note/state/bloc/auth/auth_event.dart';
 import 'package:note/state/bloc/auth/auth_state.dart';
@@ -7,6 +8,17 @@ import 'package:note/state/bloc/auth/auth_state.dart';
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  void _showToast(String msg, {Color backgroundColor = Colors.grey, Color textColor = Colors.white}) {
+    Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: backgroundColor,
+      textColor: textColor,
+      fontSize: 16.0,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +29,9 @@ class LoginPage extends StatelessWidget {
         listener: (context, state) {
           if (state is Authenticated) {
             Navigator.pushNamedAndRemoveUntil(context, '/main',(Route<dynamic> route) => false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Login berhasil!'))
-            );
+            _showToast('Login berhasil!');
           } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message))
-            );
+            _showToast(state.message, backgroundColor: Colors.red);
           }
         },
         child: Container(
@@ -50,11 +58,10 @@ class LoginPage extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Logo atau Icon
                         CircleAvatar(
                           radius: 36,
                           backgroundColor: theme.primaryColor.withValues(),
-                          child: Icon(Icons.notes, size: 40, color: Colors.white),
+                          child: Icon(Icons.notes, size: 40, color: Colors.blue),
                         ),
                         SizedBox(height: 24),
                         Text(

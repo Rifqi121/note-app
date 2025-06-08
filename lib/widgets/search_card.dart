@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NoteCard extends StatelessWidget {
+class SearchCard extends StatelessWidget {
   final Widget title;
   final Widget content;
   final String date;
@@ -8,7 +8,7 @@ class NoteCard extends StatelessWidget {
   final String priority;
   final VoidCallback? onInfo;
 
-  const NoteCard({
+  const SearchCard({
     super.key,
     required this.title,
     required this.content,
